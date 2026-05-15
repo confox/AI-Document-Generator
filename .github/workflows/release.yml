@@ -6,7 +6,29 @@ on:
       - 'v*'
 
 jobs:
+  # ── Dependency audit (runs once, not per-platform) ─────────────────────────
+  audit:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: AI-Template/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: AI-Template
+
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+        working-directory: AI-Template
+
+  # ── Build installers for all platforms ────────────────────────────────────
   release:
+    needs: audit
     environment: production
     permissions:
       contents: write
@@ -27,7 +49,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: AI-Template/package-lock.json
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -55,16 +79,14 @@ jobs:
         run: npm ci
         working-directory: AI-Template
 
-      - name: Audit frontend dependencies
-        run: npm audit --audit-level=high
-        working-directory: AI-Template
-
       - name: Build and publish release
-        uses: tauri-apps/tauri-action@v0
+        # Pin to a specific commit SHA for supply-chain safety.
+        # To update: check https://github.com/tauri-apps/tauri-action/releases
+        uses: tauri-apps/tauri-action@v0.5.20
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # ── macOS code signing & notarisation ──────────────────────────────
-          # Set these in GitHub → Settings → Environments → production → Secrets
+          # Add these in GitHub → Settings → Environments → production → Secrets
           # APPLE_CERTIFICATE:           base64-encoded .p12 Developer ID certificate
           # APPLE_CERTIFICATE_PASSWORD:  password for the .p12 file
           # APPLE_SIGNING_IDENTITY:      e.g. "Developer ID Application: Your Name (TEAMID)"
@@ -78,8 +100,8 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # ── Windows code signing ────────────────────────────────────────────
-          # TAURI_SIGNING_PRIVATE_KEY:         EV certificate private key (base64)
-          # TAURI_SIGNING_PRIVATE_KEY_PASSWORD: password for the key
+          # TAURI_SIGNING_PRIVATE_KEY:          EV certificate private key (base64)
+          # TAURI_SIGNING_PRIVATE_KEY_PASSWORD:  password for the key
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
@@ -87,6 +109,6 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: AI Docs Generator ${{ github.ref_name }}
           releaseBody: Download the installer for your platform below.
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
