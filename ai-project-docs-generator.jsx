@@ -1,4 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const STORAGE_KEY = "ai-docs-values";
+const FONT_SERIF = "'Georgia', 'Times New Roman', serif";
+const FONT_MONO = "'Courier New', monospace";
 
 const DOCS = [
   {
@@ -16,37 +20,31 @@ const DOCS = [
         id: "problem",
         title: "Problem Statement",
         hint: "What problem does this product solve?",
-        type: "textarea",
       },
       {
         id: "targetUsers",
         title: "Target Users",
         hint: "Who is this for? Describe your primary user persona.",
-        type: "textarea",
       },
       {
         id: "featuresBasic",
         title: "Feature List — Basic (MVP)",
         hint: "List core features needed at launch, one per line.",
-        type: "textarea",
       },
       {
         id: "featuresAdvanced",
         title: "Feature List — Advanced (Post-MVP)",
         hint: "Nice-to-have features for later versions, one per line.",
-        type: "textarea",
       },
       {
         id: "userFlow",
         title: "User Flow",
         hint: "Step-by-step journey: what does a user do from landing to goal?",
-        type: "textarea",
       },
       {
         id: "techPrefs",
         title: "Tech Preferences (Optional)",
         hint: "Preferred languages, frameworks, platforms, hosting, etc.",
-        type: "textarea",
       },
     ],
   },
@@ -65,31 +63,26 @@ const DOCS = [
         id: "frontendArch",
         title: "Frontend Architecture",
         hint: "Framework (React, Vue, Next.js...), folder structure, state management, routing.",
-        type: "textarea",
       },
       {
         id: "backendArch",
         title: "Backend Architecture",
         hint: "Language, framework (Node/Express, Django...), server structure, deployment.",
-        type: "textarea",
       },
       {
         id: "apiStructure",
         title: "API Structure & Flow",
         hint: "List key API endpoints. Format: METHOD /path — description",
-        type: "textarea",
       },
       {
         id: "dbSchema",
         title: "Database Schema",
         hint: "Tables/collections and their fields. e.g. Users: id, name, email, created_at",
-        type: "textarea",
       },
       {
         id: "authSecurity",
         title: "Authentication & Security Flow",
         hint: "Auth method (JWT, OAuth, session), password hashing, role-based access, etc.",
-        type: "textarea",
       },
     ],
   },
@@ -108,31 +101,26 @@ const DOCS = [
         id: "keyScreens",
         title: "Key Screens",
         hint: "List screens to design: Home, Login, Dashboard, Profile, etc.",
-        type: "textarea",
       },
       {
         id: "layoutIdeas",
         title: "Layout Ideas",
         hint: "Describe the layout per screen or paste Figma/sketch links.",
-        type: "textarea",
       },
       {
         id: "colors",
         title: "Color Palette",
         hint: "Primary, secondary, accent, background, text colors. Hex codes preferred.",
-        type: "textarea",
       },
       {
         id: "fonts",
         title: "Fonts & Typography",
         hint: "Heading font, body font, sizes, weights.",
-        type: "textarea",
       },
       {
         id: "designStyle",
         title: "Design Style",
         hint: "Minimal, glassmorphism, brutalist, playful, corporate, dark-mode-first, etc.",
-        type: "textarea",
       },
     ],
   },
@@ -151,25 +139,21 @@ const DOCS = [
         id: "featureList",
         title: "Feature List",
         hint: "List all major features of the project, one per line.",
-        type: "textarea",
       },
       {
         id: "breakdowns",
         title: "Feature Breakdowns",
-        hint: `Break each feature into sub-tasks. Example:\n\nLogin System:\n- Email validation\n- Password encryption\n- OTP / Auth flow\n\nUser Dashboard:\n- Fetch user data\n- Display stats\n- Edit profile`,
-        type: "textarea",
+        hint: "Break each feature into sub-tasks. Example:\n\nLogin System:\n- Email validation\n- Password encryption\n- OTP / Auth flow\n\nUser Dashboard:\n- Fetch user data\n- Display stats\n- Edit profile",
       },
       {
         id: "priority",
         title: "Priority Order",
         hint: "Rank features: P1 (critical), P2 (important), P3 (nice-to-have).",
-        type: "textarea",
       },
       {
         id: "dependencies",
         title: "Dependencies",
         hint: "Which features depend on others? e.g. Dashboard requires Auth to be done first.",
-        type: "textarea",
       },
     ],
   },
@@ -188,62 +172,74 @@ const DOCS = [
         id: "projectOverview",
         title: "Project Overview",
         hint: "One paragraph summary of the entire project for the AI.",
-        type: "textarea",
       },
       {
         id: "strictInstructions",
         title: "Strict Instructions",
         hint: "Rules AI must follow. e.g. Never use inline styles. Always add comments. Never skip error handling.",
-        type: "textarea",
       },
       {
         id: "techStack",
         title: "Tech Stack",
         hint: "Full stack list: Frontend, Backend, Database, Auth, Hosting, APIs, etc.",
-        type: "textarea",
       },
       {
         id: "codeStyle",
         title: "Code Style Guidelines",
         hint: "Naming conventions, file structure, commenting style, linting rules.",
-        type: "textarea",
       },
       {
         id: "outputFormat",
         title: "Output Format",
         hint: "How should AI output code? File names, folder structure, what to include in each response.",
-        type: "textarea",
       },
     ],
   },
 ];
 
-function DocCard({ doc, isActive, onClick }) {
+function DocCard({ doc, isActive, onClick, filledCount }) {
+  const [hovered, setHovered] = useState(false);
+  const complete = filledCount === doc.sections.length;
+
   return (
     <button
       onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      aria-label={`${doc.label}: ${doc.title}`}
+      aria-current={isActive ? "page" : undefined}
       style={{
         background: isActive
           ? `linear-gradient(135deg, ${doc.color}, #000)`
+          : hovered
+          ? "rgba(255,255,255,0.07)"
           : "rgba(255,255,255,0.04)",
-        border: `2px solid ${isActive ? doc.accent : "rgba(255,255,255,0.08)"}`,
+        border: `2px solid ${
+          isActive
+            ? doc.accent
+            : hovered
+            ? "rgba(255,255,255,0.18)"
+            : "rgba(255,255,255,0.08)"
+        }`,
         borderRadius: "14px",
         padding: "18px 20px",
-        cursor: "pointer",
         textAlign: "left",
-        transition: "all 0.25s ease",
+        transition: "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease",
         color: "#fff",
         width: "100%",
         boxShadow: isActive ? `0 0 24px ${doc.accent}40` : "none",
+        position: "relative",
       }}
     >
-      <div style={{ fontSize: "22px", marginBottom: "6px" }}>{doc.icon}</div>
+      <div aria-hidden="true" style={{ fontSize: "22px", marginBottom: "6px" }}>
+        {doc.icon}
+      </div>
       <div
         style={{
           fontSize: "10px",
           letterSpacing: "2px",
           color: doc.accent,
-          fontFamily: "monospace",
+          fontFamily: FONT_MONO,
           marginBottom: "4px",
         }}
       >
@@ -253,17 +249,81 @@ function DocCard({ doc, isActive, onClick }) {
         style={{
           fontSize: "13px",
           fontWeight: "700",
-          fontFamily: "'Georgia', serif",
+          fontFamily: FONT_SERIF,
           lineHeight: 1.3,
         }}
       >
         {doc.label}
       </div>
+
+      {filledCount > 0 && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: complete ? "#69f0ae" : doc.accent,
+            boxShadow: complete
+              ? "0 0 6px rgba(105, 240, 174, 0.5)"
+              : `0 0 6px ${doc.accent}80`,
+          }}
+        />
+      )}
     </button>
   );
 }
 
-function DocumentForm({ doc, values, onChange, onCopy, copied }) {
+function AutoTextarea({ id, value, onChange, placeholder, accentColor }) {
+  return (
+    <textarea
+      id={id}
+      ref={(node) => {
+        if (node) {
+          node.style.height = "auto";
+          node.style.height = node.scrollHeight + "px";
+        }
+      }}
+      value={value}
+      onChange={(e) => {
+        onChange(e.target.value);
+        e.target.style.height = "auto";
+        e.target.style.height = e.target.scrollHeight + "px";
+      }}
+      placeholder={placeholder}
+      rows={3}
+      style={{
+        width: "100%",
+        background: "rgba(0,0,0,0.3)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "10px",
+        padding: "14px 16px",
+        color: "#e8e8e8",
+        fontSize: "14px",
+        lineHeight: "1.7",
+        fontFamily: FONT_MONO,
+        resize: "none",
+        overflow: "hidden",
+        minHeight: "90px",
+        transition: "border-color 0.2s",
+      }}
+      onFocus={(e) => (e.target.style.borderColor = `${accentColor}80`)}
+      onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.08)")}
+    />
+  );
+}
+
+function DocumentForm({ doc, values, onChange, onClear }) {
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+
+  const filledSections = doc.sections.filter(
+    (s) => (values[s.id] || "").trim()
+  ).length;
+
   const exportText = () => {
     let text = `# ${doc.title}\n`;
     text += `> ${doc.subtitle}\n\n`;
@@ -273,6 +333,18 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
     text += `---\n💡 ${doc.goldenRule}`;
     return text;
   };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(exportText()).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      setCopyError(true);
+      setTimeout(() => setCopyError(false), 2000);
+    });
+  };
+
+  const copyLabel = copyError ? "✗ Failed" : copied ? "✓ Copied!" : "Copy as Prompt";
 
   return (
     <div style={{ flex: 1, minWidth: 0 }}>
@@ -289,6 +361,7 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
         }}
       >
         <div
+          aria-hidden="true"
           style={{
             position: "absolute",
             top: -40,
@@ -305,23 +378,54 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
             fontSize: "11px",
             letterSpacing: "3px",
             color: doc.accent,
-            fontFamily: "monospace",
+            fontFamily: FONT_MONO,
             marginBottom: "8px",
           }}
         >
           DOCUMENT #{doc.number} — {doc.label}
         </div>
-        <h2
+        <div
           style={{
-            fontFamily: "'Georgia', 'Times New Roman', serif",
-            fontSize: "clamp(22px, 3vw, 34px)",
-            fontWeight: "900",
-            color: "#fff",
-            margin: "0 0 8px",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: "16px",
           }}
         >
-          {doc.icon} {doc.title}
-        </h2>
+          <h2
+            style={{
+              fontFamily: FONT_SERIF,
+              fontSize: "clamp(22px, 3vw, 34px)",
+              fontWeight: "900",
+              color: "#fff",
+              margin: "0 0 8px",
+            }}
+          >
+            <span aria-hidden="true">{doc.icon} </span>
+            {doc.title}
+          </h2>
+          <div
+            aria-label={`${filledSections} of ${doc.sections.length} sections filled`}
+            style={{
+              flexShrink: 0,
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: "20px",
+              padding: "4px 12px",
+              fontSize: "11px",
+              fontFamily: FONT_MONO,
+              color:
+                filledSections === doc.sections.length
+                  ? "#69f0ae"
+                  : "rgba(255,255,255,0.4)",
+              whiteSpace: "nowrap",
+              marginTop: "4px",
+              transition: "color 0.3s",
+            }}
+          >
+            {filledSections} / {doc.sections.length} sections
+          </div>
+        </div>
         <p
           style={{
             color: "rgba(255,255,255,0.5)",
@@ -336,60 +440,44 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
 
       {/* Fields */}
       <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-        {doc.sections.map((section) => (
-          <div
-            key={section.id}
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: "14px",
-              padding: "22px 24px",
-              transition: "border-color 0.2s",
-            }}
-          >
-            <label
+        {doc.sections.map((section) => {
+          const fieldId = `${doc.id}-${section.id}`;
+          return (
+            <div
+              key={section.id}
               style={{
-                display: "block",
-                fontSize: "12px",
-                fontWeight: "700",
-                letterSpacing: "1.5px",
-                textTransform: "uppercase",
-                color: doc.accent,
-                marginBottom: "10px",
-                fontFamily: "monospace",
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: "14px",
+                padding: "22px 24px",
               }}
             >
-              ✦ {section.title}
-            </label>
-            <textarea
-              value={values[section.id] || ""}
-              onChange={(e) => onChange(section.id, e.target.value)}
-              placeholder={section.hint}
-              rows={5}
-              style={{
-                width: "100%",
-                background: "rgba(0,0,0,0.3)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "10px",
-                padding: "14px 16px",
-                color: "#e8e8e8",
-                fontSize: "14px",
-                lineHeight: "1.7",
-                fontFamily: "'Courier New', monospace",
-                resize: "vertical",
-                outline: "none",
-                boxSizing: "border-box",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) =>
-                (e.target.style.borderColor = `${doc.accent}80`)
-              }
-              onBlur={(e) =>
-                (e.target.style.borderColor = "rgba(255,255,255,0.08)")
-              }
-            />
-          </div>
-        ))}
+              <label
+                htmlFor={fieldId}
+                style={{
+                  display: "block",
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  letterSpacing: "1.5px",
+                  textTransform: "uppercase",
+                  color: doc.accent,
+                  marginBottom: "10px",
+                  fontFamily: FONT_MONO,
+                }}
+              >
+                <span aria-hidden="true">✦ </span>
+                {section.title}
+              </label>
+              <AutoTextarea
+                id={fieldId}
+                value={values[section.id] || ""}
+                onChange={(val) => onChange(section.id, val)}
+                placeholder={section.hint}
+                accentColor={doc.accent}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Footer */}
@@ -415,25 +503,54 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
             fontWeight: "600",
           }}
         >
-          👉 {doc.goldenRule}
+          <span aria-hidden="true">👉 </span>
+          {doc.goldenRule}
         </p>
-        <button
-          onClick={() => onCopy(exportText())}
-          style={{
-            background: doc.accent,
-            color: "#000",
-            border: "none",
-            borderRadius: "8px",
-            padding: "10px 22px",
-            fontWeight: "800",
-            fontSize: "13px",
-            cursor: "pointer",
-            letterSpacing: "0.5px",
-            transition: "opacity 0.2s",
-          }}
-        >
-          {copied ? "✓ Copied!" : "Copy as Prompt"}
-        </button>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <button
+            onClick={onClear}
+            aria-label={`Clear all fields in ${doc.title}`}
+            style={{
+              background: "transparent",
+              color: "rgba(255,255,255,0.35)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: "8px",
+              padding: "10px 16px",
+              fontWeight: "600",
+              fontSize: "13px",
+              transition: "color 0.2s, border-color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.35)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+            }}
+          >
+            Clear
+          </button>
+          <button
+            onClick={handleCopy}
+            aria-label={`Copy ${doc.title} as prompt`}
+            style={{
+              background: copyError ? "#ff5252" : doc.accent,
+              color: "#000",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 22px",
+              fontWeight: "800",
+              fontSize: "13px",
+              letterSpacing: "0.5px",
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            {copyLabel}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -441,8 +558,20 @@ function DocumentForm({ doc, values, onChange, onCopy, copied }) {
 
 export default function App() {
   const [activeDoc, setActiveDoc] = useState(0);
-  const [allValues, setAllValues] = useState({});
-  const [copied, setCopied] = useState(false);
+  const [allValues, setAllValues] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [exportedAll, setExportedAll] = useState(false);
+  const [exportError, setExportError] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allValues));
+  }, [allValues]);
 
   const docValues = allValues[DOCS[activeDoc].id] || {};
 
@@ -456,14 +585,45 @@ export default function App() {
     }));
   };
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const handleClear = () => {
+    setAllValues((prev) => ({
+      ...prev,
+      [DOCS[activeDoc].id]: {},
+    }));
+  };
+
+  const handleExportAll = () => {
+    let text = "";
+    DOCS.forEach((doc) => {
+      const vals = allValues[doc.id] || {};
+      text += `# ${doc.title}\n> ${doc.subtitle}\n\n`;
+      doc.sections.forEach((s) => {
+        text += `## ${s.title}\n${vals[s.id] || "(empty)"}\n\n`;
+      });
+      text += `---\n💡 ${doc.goldenRule}\n\n\n`;
+    });
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      setExportedAll(true);
+      setTimeout(() => setExportedAll(false), 2000);
+    }).catch(() => {
+      setExportError(true);
+      setTimeout(() => setExportError(false), 2000);
     });
   };
 
+  const filledCount = (docId) => {
+    const vals = allValues[docId] || {};
+    const doc = DOCS.find((d) => d.id === docId);
+    return doc.sections.filter((s) => (vals[s.id] || "").trim()).length;
+  };
+
   const doc = DOCS[activeDoc];
+
+  const exportLabel = exportError
+    ? "✗ Failed"
+    : exportedAll
+    ? "✓ All Copied!"
+    : "Export All";
 
   return (
     <div
@@ -472,11 +632,10 @@ export default function App() {
         background: "#080808",
         color: "#fff",
         fontFamily: "'Helvetica Neue', Arial, sans-serif",
-        padding: "0",
       }}
     >
       {/* Top Bar */}
-      <div
+      <header
         style={{
           background: "rgba(255,255,255,0.03)",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -488,7 +647,7 @@ export default function App() {
       >
         <span
           style={{
-            fontFamily: "monospace",
+            fontFamily: FONT_MONO,
             fontSize: "13px",
             color: "rgba(255,255,255,0.5)",
             letterSpacing: "2px",
@@ -502,12 +661,13 @@ export default function App() {
             fontSize: "10px",
             letterSpacing: "1.5px",
             color: "rgba(255,255,255,0.2)",
-            fontFamily: "monospace",
+            fontFamily: FONT_MONO,
           }}
         >
           STUDIOS
         </span>
         <span
+          aria-hidden="true"
           style={{
             width: "1px",
             height: "16px",
@@ -523,14 +683,53 @@ export default function App() {
         >
           AI Project Document Templates
         </span>
-        <span style={{ marginLeft: "auto", fontSize: "12px", color: "rgba(255,255,255,0.25)" }}>
-          Build these 5 docs before prompting AI
-        </span>
-      </div>
+        <button
+          onClick={handleExportAll}
+          aria-label="Export all five documents as a combined prompt"
+          style={{
+            marginLeft: "auto",
+            background: "rgba(255,255,255,0.06)",
+            color: exportedAll
+              ? "#69f0ae"
+              : exportError
+              ? "#ff5252"
+              : "rgba(255,255,255,0.6)",
+            border: `1px solid ${
+              exportedAll
+                ? "rgba(105, 240, 174, 0.25)"
+                : exportError
+                ? "rgba(255, 82, 82, 0.25)"
+                : "rgba(255,255,255,0.12)"
+            }`,
+            borderRadius: "8px",
+            padding: "7px 16px",
+            fontSize: "12px",
+            fontWeight: "700",
+            fontFamily: FONT_MONO,
+            letterSpacing: "0.5px",
+            transition: "background 0.2s, color 0.2s, border-color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            if (!exportedAll && !exportError) {
+              e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.9)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!exportedAll && !exportError) {
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.6)";
+            }
+          }}
+        >
+          {exportLabel}
+        </button>
+      </header>
 
       <div style={{ display: "flex", height: "calc(100vh - 57px)" }}>
         {/* Sidebar */}
-        <div
+        <nav
+          aria-label="Documents"
           style={{
             width: "200px",
             minWidth: "200px",
@@ -543,6 +742,7 @@ export default function App() {
           }}
         >
           <div
+            aria-hidden="true"
             style={{
               fontSize: "10px",
               letterSpacing: "2px",
@@ -559,10 +759,12 @@ export default function App() {
               doc={d}
               isActive={activeDoc === i}
               onClick={() => setActiveDoc(i)}
+              filledCount={filledCount(d.id)}
             />
           ))}
 
           <div
+            aria-hidden="true"
             style={{
               marginTop: "auto",
               paddingTop: "16px",
@@ -570,16 +772,16 @@ export default function App() {
               fontSize: "9px",
               letterSpacing: "1.5px",
               color: "rgba(255,255,255,0.18)",
-              fontFamily: "monospace",
+              fontFamily: FONT_MONO,
               textAlign: "center",
             }}
           >
             D4RKWOLF STUDIOS
           </div>
-        </div>
+        </nav>
 
         {/* Main */}
-        <div
+        <main
           style={{
             flex: 1,
             overflowY: "auto",
@@ -592,10 +794,9 @@ export default function App() {
             doc={doc}
             values={docValues}
             onChange={handleChange}
-            onCopy={handleCopy}
-            copied={copied}
+            onClear={handleClear}
           />
-        </div>
+        </main>
       </div>
     </div>
   );

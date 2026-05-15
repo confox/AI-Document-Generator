@@ -1,0 +1,192 @@
+export const DOCS = [
+  {
+    id: "prd",
+    number: "01",
+    label: "PRD",
+    title: "Product Requirement Document",
+    subtitle: "Tells AI WHAT to build",
+    color: "#1a1a2e",
+    accent: "#e8b84b",
+    icon: "📋",
+    goldenRule: "Clear PRD = 70% work already done",
+    sections: [
+      {
+        id: "problem",
+        title: "Problem Statement",
+        hint: "What problem does this product solve?",
+      },
+      {
+        id: "targetUsers",
+        title: "Target Users",
+        hint: "Who is this for? Describe your primary user persona.",
+      },
+      {
+        id: "featuresBasic",
+        title: "Feature List — Basic (MVP)",
+        hint: "List core features needed at launch, one per line.",
+      },
+      {
+        id: "featuresAdvanced",
+        title: "Feature List — Advanced (Post-MVP)",
+        hint: "Nice-to-have features for later versions, one per line.",
+      },
+      {
+        id: "userFlow",
+        title: "User Flow",
+        hint: "Step-by-step journey: what does a user do from landing to goal?",
+      },
+      {
+        id: "techPrefs",
+        title: "Tech Preferences (Optional)",
+        hint: "Preferred languages, frameworks, platforms, hosting, etc.",
+      },
+    ],
+  },
+  {
+    id: "system",
+    number: "02",
+    label: "SYSTEM DESIGN",
+    title: "System Design Document",
+    subtitle: "Tells AI HOW to build",
+    color: "#0d1b2a",
+    accent: "#4fc3f7",
+    icon: "🧠",
+    goldenRule: "Clean, structured & scalable code",
+    sections: [
+      {
+        id: "frontendArch",
+        title: "Frontend Architecture",
+        hint: "Framework (React, Vue, Next.js...), folder structure, state management, routing.",
+      },
+      {
+        id: "backendArch",
+        title: "Backend Architecture",
+        hint: "Language, framework (Node/Express, Django...), server structure, deployment.",
+      },
+      {
+        id: "apiStructure",
+        title: "API Structure & Flow",
+        hint: "List key API endpoints. Format: METHOD /path — description",
+      },
+      {
+        id: "dbSchema",
+        title: "Database Schema",
+        hint: "Tables/collections and their fields. e.g. Users: id, name, email, created_at",
+      },
+      {
+        id: "authSecurity",
+        title: "Authentication & Security Flow",
+        hint: "Auth method (JWT, OAuth, session), password hashing, role-based access, etc.",
+      },
+    ],
+  },
+  {
+    id: "uiux",
+    number: "03",
+    label: "UI/UX WIREFRAME",
+    title: "UI/UX Wireframes",
+    subtitle: "AI needs visual clarity",
+    color: "#1b0030",
+    accent: "#ce93d8",
+    icon: "🎨",
+    goldenRule: "Better UI clarity = Less rework later",
+    sections: [
+      {
+        id: "keyScreens",
+        title: "Key Screens",
+        hint: "List screens to design: Home, Login, Dashboard, Profile, etc.",
+      },
+      {
+        id: "layoutIdeas",
+        title: "Layout Ideas",
+        hint: "Describe the layout per screen or paste Figma/sketch links.",
+      },
+      {
+        id: "colors",
+        title: "Color Palette",
+        hint: "Primary, secondary, accent, background, text colors. Hex codes preferred.",
+      },
+      {
+        id: "fonts",
+        title: "Fonts & Typography",
+        hint: "Heading font, body font, sizes, weights.",
+      },
+      {
+        id: "designStyle",
+        title: "Design Style",
+        hint: "Minimal, glassmorphism, brutalist, playful, corporate, dark-mode-first, etc.",
+      },
+    ],
+  },
+  {
+    id: "features",
+    number: "04",
+    label: "FEATURE BREAKDOWN",
+    title: "Feature Breakdown Document",
+    subtitle: "Divide big features into small tasks",
+    color: "#0a1f0a",
+    accent: "#69f0ae",
+    icon: "✅",
+    goldenRule: "Helps AI build step-by-step, like a developer",
+    sections: [
+      {
+        id: "featureList",
+        title: "Feature List",
+        hint: "List all major features of the project, one per line.",
+      },
+      {
+        id: "breakdowns",
+        title: "Feature Breakdowns",
+        hint: "Break each feature into sub-tasks. Example:\n\nLogin System:\n- Email validation\n- Password encryption\n- OTP / Auth flow\n\nUser Dashboard:\n- Fetch user data\n- Display stats\n- Edit profile",
+      },
+      {
+        id: "priority",
+        title: "Priority Order",
+        hint: "Rank features: P1 (critical), P2 (important), P3 (nice-to-have).",
+      },
+      {
+        id: "dependencies",
+        title: "Dependencies",
+        hint: "Which features depend on others? e.g. Dashboard requires Auth to be done first.",
+      },
+    ],
+  },
+  {
+    id: "master",
+    number: "05",
+    label: "MASTER PROMPT",
+    title: "Master Prompt Document",
+    subtitle: "Your secret weapon",
+    color: "#1a0a00",
+    accent: "#ffb300",
+    icon: "⚡",
+    goldenRule: "This decides: Random code ❌ OR Production-ready output ✅",
+    sections: [
+      {
+        id: "projectOverview",
+        title: "Project Overview",
+        hint: "One paragraph summary of the entire project for the AI.",
+      },
+      {
+        id: "strictInstructions",
+        title: "Strict Instructions",
+        hint: "Rules AI must follow. e.g. Never use inline styles. Always add comments. Never skip error handling.",
+      },
+      {
+        id: "techStack",
+        title: "Tech Stack",
+        hint: "Full stack list: Frontend, Backend, Database, Auth, Hosting, APIs, etc.",
+      },
+      {
+        id: "codeStyle",
+        title: "Code Style Guidelines",
+        hint: "Naming conventions, file structure, commenting style, linting rules.",
+      },
+      {
+        id: "outputFormat",
+        title: "Output Format",
+        hint: "How should AI output code? File names, folder structure, what to include in each response.",
+      },
+    ],
+  },
+];
