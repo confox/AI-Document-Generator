@@ -96,19 +96,6 @@ Installers are output to `AI-Template/src-tauri/target/release/bundle/`.
 
 ---
 
-## Releasing
-
-Push a version tag and GitHub Actions builds installers for all platforms automatically:
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-The workflow creates a draft release on GitHub with `.msi`, `.dmg`, `.AppImage`, and `.deb` attached. Review it and publish when ready.
-
----
-
 ## Tech Stack
 
 - [React 19](https://react.dev)
@@ -145,7 +132,9 @@ AI-Template/
 
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE.md).
+
+Copyright (c) 2026 D4rkwolf Studios — free to use, modify, and distribute with attribution.
 
 ---
 
