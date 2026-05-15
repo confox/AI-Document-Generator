@@ -1,6 +1,6 @@
 # AI Project Document Templates
 
-A browser-based and installable desktop tool that helps you build the 5 essential documents you should write **before** prompting an AI coding assistant. Structured inputs produce a clean, copyable prompt for each document type.
+A browser-based and installable desktop tool that helps you build the **10 essential documents** you should write **before** prompting an AI coding assistant. Structured inputs produce a clean, copyable prompt for each document type.
 
 ---
 
@@ -14,21 +14,31 @@ Grab the latest installer for your platform from the [Releases](https://github.c
 | macOS | `.dmg` (universal — Intel & Apple Silicon) |
 | Linux | `.AppImage` or `.deb` |
 
+Or use it instantly in the browser — no install required:  
+**[Open in browser →](https://confox.github.io/AI-Docs-Generator)**
+
 ---
 
 ## Why
 
-AI coding tools give better results when given structured context. This app guides you through the five documents that together give an AI everything it needs to produce production-quality output.
+Most vibecoded projects fail not because of bad code, but because of missing context. A missing data model leads to inconsistent schemas. No security plan means vulnerable code by default. No `AGENTS.md` means every AI session starts from scratch.
 
-## The 5 Documents
+This app guides you through the ten documents that give your AI coding tool everything it needs to produce production-ready output — in the right order, every time.
 
-| # | Document | Purpose |
-|---|----------|---------|
-| 01 | **PRD** — Product Requirement Document | Tells the AI *what* to build |
-| 02 | **System Design Document** | Tells the AI *how* to build it |
-| 03 | **UI/UX Wireframes** | Gives the AI visual and design clarity |
-| 04 | **Feature Breakdown Document** | Breaks big features into step-by-step tasks |
-| 05 | **Master Prompt Document** | Combines everything into one authoritative prompt |
+## The 10 Documents
+
+| # | Document | What it gives the AI |
+|---|----------|----------------------|
+| 01 | **PRD** — Product Requirement Document | What to build and who it's for |
+| 02 | **System Design Document** | How to architect and build it |
+| 03 | **UI/UX Wireframes** | Visual and design clarity |
+| 04 | **Feature Breakdown Document** | Step-by-step build order for each feature |
+| 05 | **Master Prompt Document** | One authoritative prompt combining everything |
+| 06 | **Data Model Document** | Consistent entities, relationships, and schema |
+| 07 | **Security & Compliance Checklist** | Safe, secure code by design — not as an afterthought |
+| 08 | **Testing Strategy** | What tests to write and how to structure them |
+| 09 | **Deployment & DevOps Plan** | How the app is hosted, built, and shipped |
+| 10 | **AGENTS.md Generator** | Persistent rules for Cursor, Claude, Copilot, and other agents |
 
 ## How It Works
 
@@ -41,94 +51,61 @@ All data stays on your machine — nothing is sent to a server.
 
 ---
 
-## Development
+## Examples
+
+The `examples/` folder contains all 10 documents fully filled in for a fictional project — **TaskFlow**, a team task management SaaS app. Use them as a reference when writing your own.
+
+| File | Document |
+|------|----------|
+| [01_prd.md](examples/01_prd.md) | Product Requirement Document |
+| [02_system_design.md](examples/02_system_design.md) | System Design Document |
+| [03_uiux_wireframes.md](examples/03_uiux_wireframes.md) | UI/UX Wireframes |
+| [04_feature_breakdown.md](examples/04_feature_breakdown.md) | Feature Breakdown Document |
+| [05_master_prompt.md](examples/05_master_prompt.md) | Master Prompt Document |
+| [06_data_model.md](examples/06_data_model.md) | Data Model Document |
+| [07_security.md](examples/07_security.md) | Security & Compliance Checklist |
+| [08_testing_strategy.md](examples/08_testing_strategy.md) | Testing Strategy |
+| [09_deployment.md](examples/09_deployment.md) | Deployment & DevOps Plan |
+| [10_agents_md.md](examples/10_agents_md.md) | AGENTS.md — AI Rules File |
+
+---
+
+## Contributing
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org) (LTS)
-- [Rust](https://rustup.rs) (for desktop builds)
+- [Rust](https://rustup.rs) (for desktop builds only)
 
-### Run in the browser
+### Run locally
 
 ```bash
 git clone https://github.com/confox/AI-Docs-Generator.git
 cd AI-Docs-Generator/AI-Template
 npm install
-npm run dev
+npm run dev        # browser: http://localhost:5173
+npm run tauri dev  # desktop app
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
+### Adding a new document type
 
-### Run as a desktop app
+Open `AI-Template/src/docs.js` and add a new object to the `DOCS` array. The app renders all documents from this array dynamically — no other files need changing. See [AGENTS.md](AGENTS.md) for the full contributor guide.
+
+### Releases
+
+Desktop installers (`.msi`, `.dmg`, `.AppImage`, `.deb`) are built automatically by GitHub Actions when a version tag is pushed:
 
 ```bash
-cd AI-Template
-npm install
-npm run tauri dev
+git tag v1.x.x && git push origin v1.x.x
 ```
 
-### First-time setup — generate app icons
+### Tech Stack
 
-Tauri requires icons in multiple sizes. Generate them from the existing SVG once:
-
-```bash
-cd AI-Template
-npm run tauri icon public/app-icon.svg
-```
-
-Commit the generated `src-tauri/icons/` directory before pushing.
-
-### Build for production (web)
-
-```bash
-npm run build
-```
-
-Output is in `AI-Template/dist/`. Deploy to any static host (Vercel, Netlify, GitHub Pages, etc.).
-
-### Build desktop installers locally
-
-```bash
-npm run tauri build
-```
-
-Installers are output to `AI-Template/src-tauri/target/release/bundle/`.
-
----
-
-## Tech Stack
-
-- [React 19](https://react.dev)
-- [Vite 8](https://vite.dev)
+- [React 19](https://react.dev) + [Vite 8](https://vite.dev)
 - [Tauri 2](https://tauri.app) — desktop wrapper
 - No external UI library — all styles are inline CSS
 
-## Project Structure
-
-```
-ai-project-docs-generator.jsx  # Standalone component (no build tools needed)
-AI-Template/
-├── src/
-│   ├── App.jsx             # All document definitions and UI
-│   ├── main.jsx            # React entry point
-│   ├── App.css
-│   └── index.css
-├── src-tauri/
-│   ├── src/
-│   │   ├── main.rs         # Desktop entry point
-│   │   └── lib.rs          # Tauri app setup
-│   ├── icons/              # App icons (generate with: npm run tauri icon public/app-icon.svg)
-│   ├── Cargo.toml
-│   └── tauri.conf.json
-├── public/
-│   ├── app-icon.svg        # Source icon for tauri icon command
-│   └── favicon.svg         # Browser tab icon
-├── index.html
-└── vite.config.js
-.github/
-└── workflows/
-    └── release.yml         # Builds installers on version tag push
-```
+---
 
 ## License
 
