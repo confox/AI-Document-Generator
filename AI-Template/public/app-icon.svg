@@ -1,5 +1,70 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#12001f"/>
-  <path fill="#863bff" d="M291 68c9.6 0 15.2 10.9 9.6 18.7L222.3 195c-11.2 15.7 0 37.5 19.3 37.5h78.8c9.9 0 15.4 11.4 9.3 19.2L221 441.3c-7 8.9-21.2 3.9-21.2-7.3V334.2c0-13-10.6-23.7-23.7-23.7H97.3c-9.6 0-15.2-10.9-9.6-18.7L196 84.7c2.2-3.1 5.8-4.9 9.6-4.9H291z"/>
-  <path fill="#b47fff" fill-opacity="0.35" d="M319.6 86.7C314 78.9 304 74 293.4 74H208c-5.5 0-10.7 2.6-14 7L85.6 289.3C79 297.4 84.8 309 95 309h82.8c7.4 0 13.4 6 13.4 13.4v103c0 13.7 16.6 20 25.2 9.7l114-148.3c7.5-9.7.7-23.8-11.5-23.8h-77.7c-22 0-33.5-25.7-19.4-42.6l97.8-113.7z"/>
+  <defs>
+    <linearGradient id="docFill" x1="164" y1="104" x2="384" y2="394" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2a1260"/>
+      <stop offset="100%" stop-color="#120828"/>
+    </linearGradient>
+    <filter id="boltGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="appShape">
+      <rect width="512" height="512" rx="96"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#appShape)">
+    <!-- Background -->
+    <rect width="512" height="512" fill="#0c0118"/>
+    <!-- Subtle ambient glow -->
+    <ellipse cx="256" cy="230" rx="210" ry="200" fill="#3b0764" opacity="0.16"/>
+
+    <!-- Back document (most receded, rotated left) -->
+    <rect x="96" y="134" width="216" height="278" rx="16" fill="#16063a"
+          transform="rotate(-9 204 273)"/>
+
+    <!-- Middle document -->
+    <rect x="130" y="120" width="216" height="278" rx="16" fill="#1c0b46"
+          transform="rotate(-3 238 259)"/>
+
+    <!-- Front document body -->
+    <rect x="162" y="106" width="222" height="292" rx="16" fill="url(#docFill)"/>
+
+    <!-- Front document border -->
+    <rect x="162" y="106" width="222" height="292" rx="16" fill="none"
+          stroke="#7c3aff" stroke-width="2.5" stroke-opacity="0.48"/>
+
+    <!-- Document header band (rounded top, flat bottom) -->
+    <rect x="162" y="106" width="222" height="54" rx="16" fill="#38127a"/>
+    <rect x="162" y="128" width="222" height="32" fill="#38127a"/>
+
+    <!-- Header: title bar -->
+    <rect x="183" y="122" width="118" height="12" rx="6" fill="#c4b5fd" opacity="0.88"/>
+    <!-- Header: subtitle bar -->
+    <rect x="183" y="141" width="76" height="8" rx="4" fill="#9f7aea" opacity="0.42"/>
+
+    <!-- Content lines: 4 pairs of label + value -->
+    <rect x="183" y="178" width="150" height="9" rx="4.5" fill="rgba(255,255,255,0.22)"/>
+    <rect x="183" y="198" width="116" height="8" rx="4"   fill="rgba(255,255,255,0.12)"/>
+
+    <rect x="183" y="228" width="150" height="9" rx="4.5" fill="rgba(255,255,255,0.22)"/>
+    <rect x="183" y="248" width="94"  height="8" rx="4"   fill="rgba(255,255,255,0.12)"/>
+
+    <rect x="183" y="278" width="150" height="9" rx="4.5" fill="rgba(255,255,255,0.22)"/>
+    <rect x="183" y="298" width="130" height="8" rx="4"   fill="rgba(255,255,255,0.12)"/>
+
+    <rect x="183" y="328" width="150" height="9" rx="4.5" fill="rgba(255,255,255,0.22)"/>
+    <rect x="183" y="348" width="106" height="8" rx="4"   fill="rgba(255,255,255,0.12)"/>
+
+    <!-- Lightning bolt — bottom-right, overlapping document corner -->
+    <!-- Outer glow -->
+    <path d="M386 318 L354 374 H378 L365 414 L410 358 H384 Z"
+          fill="#7c3aff" filter="url(#boltGlow)" opacity="0.6"/>
+    <!-- Bolt fill -->
+    <path d="M386 318 L354 374 H378 L365 414 L410 358 H384 Z"
+          fill="#c4b5fd"/>
+  </g>
 </svg>

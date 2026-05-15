@@ -1,7 +1,67 @@
-/* ─── Reset ─────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
+/* ─── Design tokens ──────────────────────────────────────── */
+:root {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-display: 'IBM Plex Sans', system-ui, sans-serif;
+
+  --d: 1;
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+
+  --accent: #e8b84b;
+  --accent-ink: #0a0a0a;
+  --accent-soft: color-mix(in oklch, var(--accent) 22%, transparent);
+  --accent-glow: color-mix(in oklch, var(--accent) 60%, transparent);
 }
+
+/* ─── Dark palette ───────────────────────────────────────── */
+.theme-dark {
+  --bg-0: #0a0b0d;
+  --bg-1: #111317;
+  --bg-2: #15181d;
+  --bg-3: #1c2026;
+  --bg-4: #242931;
+  --line: #232831;
+  --line-2: #2c333e;
+  --ink-0: #e7ecf3;
+  --ink-1: #c1c8d2;
+  --ink-2: #8a93a0;
+  --ink-3: #5a6371;
+  --ink-4: #3d4452;
+  --danger: #ff6b6b;
+  --warn: #ffb84d;
+  --good: #5ad19f;
+  --info: #5fa8ff;
+  --magenta: #ff7ad9;
+  --cyan: #5ee6e6;
+}
+
+/* ─── Light palette ──────────────────────────────────────── */
+.theme-light {
+  --bg-0: #f6f7f9;
+  --bg-1: #ffffff;
+  --bg-2: #f1f3f6;
+  --bg-3: #e7eaf0;
+  --bg-4: #dde1e8;
+  --line: #e1e5ec;
+  --line-2: #cdd3dc;
+  --ink-0: #0a0c10;
+  --ink-1: #2a3037;
+  --ink-2: #5b6470;
+  --ink-3: #8a929e;
+  --ink-4: #b4bbc5;
+  --danger: #d6453a;
+  --warn: #c97a14;
+  --good: #1f9b5c;
+  --info: #2c6ed1;
+  --magenta: #c440a4;
+  --cyan: #168f8f;
+}
+
+/* ─── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -9,57 +69,45 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-}
+h1, h2, h3, h4, h5, h6 { margin: 0; }
 
-#root {
-  min-height: 100vh;
-}
+#root { height: 100vh; overflow: hidden; }
 
-/* ─── Form element baseline ──────────────────────────────── */
 button {
   font-family: inherit;
   cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
 }
 
-input,
-textarea,
-select {
-  font-family: inherit;
+input, textarea, select { font-family: inherit; }
+textarea { resize: none; }
+
+/* ─── App shell ──────────────────────────────────────────── */
+.app {
+  font-family: var(--font-sans);
+  color: var(--ink-0);
+  background: var(--bg-0);
+  height: 100vh;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-/* ─── Scrollbars (dark theme) ────────────────────────────── */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
+/* ─── Scrollbars ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-2, rgba(255,255,255,.1)); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-4, rgba(255,255,255,.2)); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+/* ─── Focus ──────────────────────────────────────────────── */
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input:focus-visible, textarea:focus-visible { outline: none; }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ─── Placeholder ────────────────────────────────────────── */
-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.22);
+/* ─── Placeholders ───────────────────────────────────────── */
+input::placeholder, textarea::placeholder {
+  color: var(--ink-3);
   font-style: italic;
-}
-
-/* ─── Keyboard focus ─────────────────────────────────────── */
-button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.45);
-  outline-offset: 2px;
-}
-
-textarea:focus-visible {
-  outline: none;
 }
