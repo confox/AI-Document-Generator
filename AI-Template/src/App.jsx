@@ -1291,7 +1291,16 @@ export default function App() {
     try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : {}; } catch { return {}; }
   });
   const [settings, setSettings] = useState(() => {
-    try { const s = localStorage.getItem(SETTINGS_KEY); return s ? { ...DEFAULT_SETTINGS, ...JSON.parse(s) } : DEFAULT_SETTINGS; } catch { return DEFAULT_SETTINGS; }
+    try {
+      const s = localStorage.getItem(SETTINGS_KEY);
+      if (!s) return DEFAULT_SETTINGS;
+      const parsed = JSON.parse(s);
+      return {
+        ...DEFAULT_SETTINGS,
+        ...parsed,
+        accent: ACCENTS.some((a) => a.value === parsed.accent) ? parsed.accent : DEFAULT_SETTINGS.accent,
+      };
+    } catch { return DEFAULT_SETTINGS; }
   });
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [copyState, setCopyState] = useState(null);
@@ -1335,10 +1344,11 @@ export default function App() {
   }, []);
 
   const densityScale = settings.density === "compact" ? 0.88 : settings.density === "comfy" ? 1.12 : 1;
+  const safeAccent = ACCENTS.some((a) => a.value === settings.accent) ? settings.accent : DEFAULT_SETTINGS.accent;
   const rootStyle = {
-    "--accent": settings.accent,
-    "--accent-soft": `color-mix(in oklch, ${settings.accent} 22%, transparent)`,
-    "--accent-glow": `color-mix(in oklch, ${settings.accent} 60%, transparent)`,
+    "--accent": safeAccent,
+    "--accent-soft": `color-mix(in oklch, ${safeAccent} 22%, transparent)`,
+    "--accent-glow": `color-mix(in oklch, ${safeAccent} 60%, transparent)`,
     "--d": densityScale,
   };
 
