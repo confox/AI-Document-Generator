@@ -1,13 +1,9 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default capability for the main window",
+  "description": "Default capability for the main window — minimal permissions, no filesystem or dialog access required",
   "windows": ["main"],
   "permissions": [
-    "core:default",
-    "dialog:allow-open",
-    "dialog:allow-save",
-    "fs:allow-read-text-file",
-    "fs:allow-write-text-file"
+    "core:default"
   ]
 }
