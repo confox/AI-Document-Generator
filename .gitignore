@@ -40,8 +40,8 @@ Thumbs.db
 .vite/
 **/.vite/
 
-# Research
-research/
+# Project documentation
+docs/
 
 # Tauri / Rust build output
 src-tauri/target/
