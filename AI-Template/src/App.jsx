@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import * as Sentry from "@sentry/react"; // TODO: remove after Sentry verification
 import { DOCS } from "@/docs.js";
 import { STORAGE_KEY, SETTINGS_KEY, DEFAULT_SETTINGS, ACCENTS } from "@/constants.js";
 import { buildDocPrompt, buildAllPrompt } from "@/utils/prompt.js";
@@ -80,6 +81,28 @@ export default function App() {
     copyState, exportState, settings,
   };
 
+  // TODO: Remove ErrorButton once Sentry is verified in the dashboard
+  function ErrorButton() {
+    return (
+      <button
+        onClick={() => {
+          Sentry.logger.info("User triggered test error", { action: "test_error_button_click" });
+          Sentry.metrics.count("test_counter", 1);
+          throw new Error("This is your first error!");
+        }}
+        style={{
+          position: "fixed", bottom: 18, right: 18, zIndex: 9999,
+          padding: "8px 14px", borderRadius: "var(--r-md)",
+          background: "#e53e3e", color: "#fff", border: "none",
+          fontFamily: "var(--font-mono)", fontSize: 12, cursor: "pointer",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.4)",
+        }}
+      >
+        🔥 Break the world
+      </button>
+    );
+  }
+
   return (
     <div className={`app theme-${settings.theme}`} style={rootStyle}>
       {settings.direction === "terminal" && <TerminalDirection {...dirProps} />}
@@ -103,6 +126,9 @@ export default function App() {
       >
         ⚙
       </button>
+
+      {/* TODO: Remove once Sentry verified */}
+      <ErrorButton />
 
       {tweaksOpen && (
         <TweaksPanel settings={settings} onChange={setSettings} onClose={() => setTweaksOpen(false)} />

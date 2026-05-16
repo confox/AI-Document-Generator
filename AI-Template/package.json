@@ -1,7 +1,7 @@
 {
   "name": "ai-template",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "author": "D4rkwolf Studios",
   "type": "module",
   "scripts": {
@@ -19,6 +19,8 @@
     "@eslint/js": "^10.0.1",
     "@fontsource/ibm-plex-sans": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
+    "@sentry/react": "^10.53.1",
+    "@sentry/vite-plugin": "^5.3.0",
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
