@@ -1,6 +1,6 @@
 [package]
 name = "ai-docs-generator"
-version = "1.1.0"
+version = "1.1.1"
 description = "AI Project Document Templates"
 authors = ["D4rkwolf Studios"]
 edition = "2021"
