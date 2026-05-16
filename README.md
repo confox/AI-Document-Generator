@@ -15,7 +15,7 @@ Grab the latest installer for your platform from the [Releases](https://github.c
 | Linux | `.AppImage` or `.deb` |
 
 Or use it instantly in the browser — no install required:  
-**[Open in browser →](https://confox.github.io/AI-Document-Generator/)**
+**[Open in browser →](https://d4rk-wolf.github.io/AI-Document-Generator/)**
 
 ---
 
