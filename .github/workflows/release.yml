@@ -6,29 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  # ── Dependency audit (runs once, not per-platform) ─────────────────────────
-  audit:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: AI-Template/package-lock.json
-
-      - name: Install frontend dependencies
-        run: npm ci
-        working-directory: AI-Template
-
-      - name: Audit frontend dependencies
-        run: npm audit --audit-level=high
-        working-directory: AI-Template
-
-  # ── Build installers for all platforms ────────────────────────────────────
   release:
-    needs: audit
     environment: production
     permissions:
       contents: write
@@ -77,6 +55,12 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm ci
+        working-directory: AI-Template
+
+      - name: Audit frontend dependencies
+        # Run once — only on the Linux runner (same result on all platforms)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: npm audit --audit-level=high
         working-directory: AI-Template
 
       - name: Build and publish release
