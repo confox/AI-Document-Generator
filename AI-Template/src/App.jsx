@@ -2,10 +2,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { DOCS } from "@/docs.js";
 import { STORAGE_KEY, SETTINGS_KEY, DEFAULT_SETTINGS, ACCENTS } from "@/constants.js";
 import { buildDocPrompt, buildAllPrompt } from "@/utils/prompt.js";
+import { useDebounce } from "@/hooks/useDebounce.js";
 import { TweaksPanel } from "@/components/TweaksPanel.jsx";
 import { TerminalDirection } from "@/layouts/TerminalDirection.jsx";
 import { ComposeDirection } from "@/layouts/ComposeDirection.jsx";
 import { ManuscriptDirection } from "@/layouts/ManuscriptDirection.jsx";
+
+const validateAccent = (accent) =>
+  ACCENTS.some((a) => a.value === accent) ? accent : DEFAULT_SETTINGS.accent;
 
 export default function App() {
   const [activeDoc, setActiveDoc] = useState(0);
@@ -17,19 +21,17 @@ export default function App() {
       const s = localStorage.getItem(SETTINGS_KEY);
       if (!s) return DEFAULT_SETTINGS;
       const parsed = JSON.parse(s);
-      return {
-        ...DEFAULT_SETTINGS,
-        ...parsed,
-        accent: ACCENTS.some((a) => a.value === parsed.accent) ? parsed.accent : DEFAULT_SETTINGS.accent,
-      };
+      return { ...DEFAULT_SETTINGS, ...parsed, accent: validateAccent(parsed.accent) };
     } catch { return DEFAULT_SETTINGS; }
   });
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [copyState, setCopyState] = useState(null);
   const [exportState, setExportState] = useState(null);
 
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(allValues)); }, [allValues]);
-  useEffect(() => { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }, [settings]);
+  const debouncedValues = useDebounce(allValues, 500);
+  const debouncedSettings = useDebounce(settings, 500);
+  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(debouncedValues)); }, [debouncedValues]);
+  useEffect(() => { localStorage.setItem(SETTINGS_KEY, JSON.stringify(debouncedSettings)); }, [debouncedSettings]);
 
   const doc = DOCS[activeDoc];
   const docValues = allValues[doc.id] || {};
@@ -65,7 +67,7 @@ export default function App() {
   }, []);
 
   const densityScale = settings.density === "compact" ? 0.88 : settings.density === "comfy" ? 1.12 : 1;
-  const safeAccent = ACCENTS.some((a) => a.value === settings.accent) ? settings.accent : DEFAULT_SETTINGS.accent;
+  const safeAccent = validateAccent(settings.accent);
   const rootStyle = {
     "--accent": safeAccent,
     "--accent-soft": `color-mix(in oklch, ${safeAccent} 22%, transparent)`,

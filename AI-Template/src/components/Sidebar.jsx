@@ -3,8 +3,7 @@ import { countFilled } from "@/utils/prompt.js";
 import { ProgressDot } from "@/components/ProgressDot.jsx";
 
 // ─── Terminal variant item ─────────────────────────────────────
-function TerminalItem({ d, selected, icons, allValues, onClick }) {
-  const filled = countFilled(d, allValues[d.id] || {});
+function TerminalItem({ d, selected, icons, filled, onClick }) {
   const hasFill = filled > 0;
   return (
     <button
@@ -46,9 +45,8 @@ function TerminalItem({ d, selected, icons, allValues, onClick }) {
 }
 
 // ─── Compose variant item ──────────────────────────────────────
-function ComposeItem({ d, selected, icons, allValues, onClick }) {
+function ComposeItem({ d, selected, icons, filled, onClick }) {
   const [hovered, setHovered] = useState(false);
-  const filled = countFilled(d, allValues[d.id] || {});
   const pct = d.sections.length > 0 ? filled / d.sections.length : 0;
   const complete = pct === 1 && d.sections.length > 0;
   return (
@@ -91,8 +89,7 @@ function ComposeItem({ d, selected, icons, allValues, onClick }) {
 }
 
 // ─── Manuscript variant item ───────────────────────────────────
-function ManuscriptItem({ d, selected, icons, allValues, onClick }) {
-  const filled = countFilled(d, allValues[d.id] || {});
+function ManuscriptItem({ d, selected, icons, filled, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -133,9 +130,11 @@ function ManuscriptItem({ d, selected, icons, allValues, onClick }) {
 export function Sidebar({ variant, docs, activeDoc, onSelectDoc, allValues, settings }) {
   const icons = settings.sidebar === "icons";
 
-  const totalFilled = docs.reduce((acc, d) => acc + countFilled(d, allValues[d.id] || {}), 0);
+  // Compute fill counts once; pass down to items to avoid redundant calls
+  const fillCounts = docs.map((d) => countFilled(d, allValues[d.id] || {}));
+  const totalFilled = fillCounts.reduce((acc, n) => acc + n, 0);
   const totalSections = docs.reduce((acc, d) => acc + d.sections.length, 0);
-  const completedDocs = docs.filter((d) => countFilled(d, allValues[d.id] || {}) === d.sections.length).length;
+  const completedDocs = fillCounts.filter((n, i) => n === docs[i].sections.length).length;
   const overallPct = totalSections > 0 ? Math.round((totalFilled / totalSections) * 100) : 0;
 
   const ItemComponent = variant === "terminal" ? TerminalItem
@@ -156,7 +155,7 @@ export function Sidebar({ variant, docs, activeDoc, onSelectDoc, allValues, sett
             <div style={{ padding: "4px 16px 6px", color: "var(--ink-4)", fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase" }}>docs/</div>
           )}
           {docs.map((d, i) => (
-            <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} allValues={allValues} onClick={() => onSelectDoc(i)} />
+            <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} filled={fillCounts[i]} onClick={() => onSelectDoc(i)} />
           ))}
           {!icons && (
             <>
@@ -207,7 +206,7 @@ export function Sidebar({ variant, docs, activeDoc, onSelectDoc, allValues, sett
           </div>
         )}
         {docs.map((d, i) => (
-          <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} allValues={allValues} onClick={() => onSelectDoc(i)} />
+          <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} filled={fillCounts[i]} onClick={() => onSelectDoc(i)} />
         ))}
         {!icons && (
           <>
@@ -241,7 +240,7 @@ export function Sidebar({ variant, docs, activeDoc, onSelectDoc, allValues, sett
         </div>
       )}
       {docs.map((d, i) => (
-        <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} allValues={allValues} onClick={() => onSelectDoc(i)} />
+        <ItemComponent key={d.id} d={d} selected={activeDoc === i} icons={icons} filled={fillCounts[i]} onClick={() => onSelectDoc(i)} />
       ))}
       <div style={{ flex: 1 }} />
       {!icons && (

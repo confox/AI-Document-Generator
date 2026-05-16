@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar.jsx";
 import { PromptPreview } from "@/components/PromptPreview.jsx";
+import { AutosaveIndicator } from "@/components/AutosaveIndicator.jsx";
 import { KBD } from "@/components/KBD.jsx";
 import { LineInput } from "@/components/inputs/LineInput.jsx";
 import { BlockInput } from "@/components/inputs/BlockInput.jsx";
 import { ListInput } from "@/components/inputs/ListInput.jsx";
+import { getCopyLabel } from "@/utils/ui.js";
 
 export function ComposeDirection({ docs, activeDoc, onSelectDoc, docValues, allValues, onChange, onCopy, onExportAll, copyState, exportState, settings }) {
   const doc = docs[activeDoc];
@@ -14,8 +16,8 @@ export function ComposeDirection({ docs, activeDoc, onSelectDoc, docValues, allV
 
   useEffect(() => { setTab("edit"); setFocusedId(null); }, [activeDoc]);
 
-  const copyLabel = copyState === "ok" ? "✓ Copied!" : copyState === "err" ? "✗ Failed" : "Copy prompt";
-  const exportLabel = exportState === "ok" ? "✓ Copied!" : exportState === "err" ? "✗ Failed" : "Export";
+  const copyLabel = getCopyLabel(copyState);
+  const exportLabel = getCopyLabel(exportState, { idle: "Export", ok: "✓ Copied!", err: "✗ Failed" });
 
   const scrollToField = (fieldId) => {
     setFocusedId(fieldId);
@@ -47,24 +49,10 @@ export function ComposeDirection({ docs, activeDoc, onSelectDoc, docValues, allV
           <span style={{ color: "var(--ink-0)", fontSize: 13 }}>{doc.short}</span>
         </div>
 
-        <div style={{
-          flex: 1, maxWidth: 360, height: 30, margin: "0 auto",
-          display: "flex", alignItems: "center", gap: 8,
-          background: "var(--bg-2)", border: "1px solid var(--line-2)",
-          borderRadius: "var(--r-md)", padding: "0 12px", color: "var(--ink-3)",
-        }}>
-          <svg width="12" height="12" viewBox="0 0 13 13" fill="none">
-            <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M8.5 8.5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          <span style={{ fontSize: 12, flex: 1, color: "var(--ink-4)" }}>Search docs, jump to field…</span>
-        </div>
+        <div style={{ flex: 1 }} />
 
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--ink-3)", fontSize: 11 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--good)" }} />
-            <span>Autosaved</span>
-          </span>
+          <AutosaveIndicator style={{ color: "var(--ink-3)", fontSize: 11 }} />
           <div style={{ width: 1, height: 16, background: "var(--line-2)" }} />
           <button onClick={onExportAll} style={{
             height: 28, padding: "0 12px", border: "1px solid var(--line-2)", borderRadius: "var(--r-sm)",
@@ -150,7 +138,8 @@ export function ComposeDirection({ docs, activeDoc, onSelectDoc, docValues, allV
                             <ListInput id={fid} value={docValues[s.id] || ""} onChange={(v) => onChange(s.id, v)} placeholder={s.hint}
                               wrapperStyle={{ padding: "4px 6px" }}
                               rowStyle={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 8px", borderBottom: "1px solid var(--line)" }}
-                              badgeStyle={{ minWidth: 20, height: 20, borderRadius: "var(--r-xs)", background: "var(--bg-3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "var(--ink-3)", fontFamily: "var(--font-mono)", flexShrink: 0, padding: "0 4px", textAlign: "center", padStart: 1 }}
+                              badgeStyle={{ minWidth: 20, height: 20, borderRadius: "var(--r-xs)", background: "var(--bg-3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "var(--ink-3)", fontFamily: "var(--font-mono)", flexShrink: 0, padding: "0 4px", textAlign: "center" }}
+                              badgePadLength={1}
                               inputExtraStyle={{ fontSize: 13, padding: "0" }}
                               addStyle={{ color: "var(--ink-3)", fontSize: 12, padding: "8px 16px", textAlign: "left", width: "100%" }}
                             />
@@ -229,8 +218,7 @@ export function ComposeDirection({ docs, activeDoc, onSelectDoc, docValues, allV
               pointerEvents: "auto",
               boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
             }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--good)" }} />
-              <span>Autosaved</span>
+              <AutosaveIndicator />
             </div>
             <button onClick={onCopy} style={{
               height: 42, padding: "0 18px",

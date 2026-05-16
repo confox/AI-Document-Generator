@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar.jsx";
 import { PromptPreview } from "@/components/PromptPreview.jsx";
+import { AutosaveIndicator } from "@/components/AutosaveIndicator.jsx";
 import { LineInput } from "@/components/inputs/LineInput.jsx";
 import { BlockInput } from "@/components/inputs/BlockInput.jsx";
 import { ListInput } from "@/components/inputs/ListInput.jsx";
 import { countFilled } from "@/utils/prompt.js";
+import { getCopyLabel } from "@/utils/ui.js";
 
 export function ManuscriptDirection({ docs, activeDoc, onSelectDoc, docValues, allValues, onChange, onCopy, onExportAll, copyState, exportState, settings }) {
   const doc = docs[activeDoc];
@@ -14,7 +16,7 @@ export function ManuscriptDirection({ docs, activeDoc, onSelectDoc, docValues, a
 
   useEffect(() => { setFocusedIdx(null); }, [activeDoc]);
 
-  const copyLabel = copyState === "ok" ? "✓ Copied!" : copyState === "err" ? "✗ Failed" : "Copy prompt";
+  const copyLabel = getCopyLabel(copyState);
 
   return (
     <div style={{ height: "100%", display: "grid", gridTemplateRows: "60px 1fr", overflow: "hidden" }}>
@@ -73,10 +75,7 @@ export function ManuscriptDirection({ docs, activeDoc, onSelectDoc, docValues, a
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--ink-3)", fontSize: 11 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--good)" }} />
-            Saved locally
-          </span>
+          <AutosaveIndicator label="Saved locally" style={{ color: "var(--ink-3)", fontSize: 11 }} />
           <button onClick={onExportAll} style={{
             height: 28, padding: "0 12px",
             background: "var(--bg-2)", border: "1px solid var(--line-2)",
@@ -98,145 +97,152 @@ export function ManuscriptDirection({ docs, activeDoc, onSelectDoc, docValues, a
           <Sidebar variant="manuscript" docs={docs} activeDoc={activeDoc} onSelectDoc={onSelectDoc} allValues={allValues} settings={settings} />
         )}
 
-        {/* Canvas */}
-        <div style={{ position: "relative", background: "var(--bg-0)", overflowY: "auto" }}>
-          <div style={{ maxWidth: 720, margin: "0 auto", padding: "52px 52px 200px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11, color: "var(--ink-4)", fontFamily: "var(--font-mono)", marginBottom: 14 }}>
-              <span>DOC {doc.n}</span>
-              <span>·</span>
-              <span>{doc.sections.length} fields</span>
-              <span>·</span>
-              <span>draft</span>
-            </div>
+        {/* Canvas — flex row so preview panel is outside the scroll flow */}
+        <div style={{ display: "flex", overflow: "hidden", background: "var(--bg-0)" }}>
+          {/* Scrollable content column */}
+          <div style={{ flex: 1, overflowY: "auto" }}>
+            <div style={{ maxWidth: 720, margin: "0 auto", padding: "52px 52px 200px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 11, color: "var(--ink-4)", fontFamily: "var(--font-mono)", marginBottom: 14 }}>
+                <span>DOC {doc.n}</span>
+                <span>·</span>
+                <span>{doc.sections.length} fields</span>
+                <span>·</span>
+                <span>draft</span>
+              </div>
 
-            <h1 style={{
-              margin: "0 0 10px",
-              fontFamily: "var(--font-display)",
-              fontSize: 44, fontWeight: 600, letterSpacing: -1.4,
-              color: "var(--ink-0)", lineHeight: 1.05,
-            }}>{doc.title}</h1>
-            <p style={{ margin: "0 0 36px", color: "var(--ink-3)", fontSize: 15, lineHeight: 1.6, maxWidth: 560 }}>
-              {doc.purpose}. Empty fields appear as{" "}
-              <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent)", fontSize: 13 }}>&lt;todo&gt;</span>{" "}
-              in the generated prompt.
-            </p>
+              <h1 style={{
+                margin: "0 0 10px",
+                fontFamily: "var(--font-display)",
+                fontSize: 44, fontWeight: 600, letterSpacing: -1.4,
+                color: "var(--ink-0)", lineHeight: 1.05,
+              }}>{doc.title}</h1>
+              <p style={{ margin: "0 0 36px", color: "var(--ink-3)", fontSize: 15, lineHeight: 1.6, maxWidth: 560 }}>
+                {doc.purpose}. Empty fields appear as{" "}
+                <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent)", fontSize: 13 }}>&lt;todo&gt;</span>{" "}
+                in the generated prompt.
+              </p>
 
-            <div style={{ height: 1, background: "var(--line)", marginBottom: 0 }} />
+              <div style={{ height: 1, background: "var(--line)", marginBottom: 0 }} />
 
-            <div>
-              {doc.sections.map((s, i) => {
-                const fid = `${doc.id}-${s.id}`;
-                const focused = focusedIdx === i;
-                const underline = focused ? "inset 0 -2px 0 var(--accent)" : "inset 0 -1px 0 var(--line)";
-                const v = docValues[s.id] || "";
-                const filled = s.kind === "list" ? v.split("\n").some((l) => l.trim()) : v.trim().length > 0;
-                return (
-                  <div key={s.id} style={{
-                    display: "grid", gridTemplateColumns: "40px 1fr", gap: 16,
-                    padding: "22px 0", borderBottom: "1px solid var(--line)",
-                  }}>
-                    <div style={{
-                      paddingTop: 7, textAlign: "right",
-                      color: focused ? "var(--accent)" : filled ? "var(--ink-3)" : "var(--ink-4)",
-                      fontFamily: "var(--font-mono)", fontSize: 11,
-                      transition: "color 0.15s",
+              <div>
+                {doc.sections.map((s, i) => {
+                  const fid = `${doc.id}-${s.id}`;
+                  const focused = focusedIdx === i;
+                  const underline = focused ? "inset 0 -2px 0 var(--accent)" : "inset 0 -1px 0 var(--line)";
+                  const v = docValues[s.id] || "";
+                  const filled = s.kind === "list" ? v.split("\n").some((l) => l.trim()) : v.trim().length > 0;
+                  return (
+                    <div key={s.id} style={{
+                      display: "grid", gridTemplateColumns: "40px 1fr", gap: 16,
+                      padding: "22px 0", borderBottom: "1px solid var(--line)",
                     }}>
-                      § {String(i + 1).padStart(2, "0")}
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
-                        <label htmlFor={fid} style={{
-                          fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 500,
-                          color: focused ? "var(--ink-0)" : "var(--ink-1)", letterSpacing: -0.2,
-                          transition: "color 0.15s",
-                        }}>{s.title}</label>
-                        <span style={{ fontSize: 9, color: "var(--ink-4)", fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: 1.2 }}>{s.kind}</span>
+                      <div style={{
+                        paddingTop: 7, textAlign: "right",
+                        color: focused ? "var(--accent)" : filled ? "var(--ink-3)" : "var(--ink-4)",
+                        fontFamily: "var(--font-mono)", fontSize: 11,
+                        transition: "color 0.15s",
+                      }}>
+                        § {String(i + 1).padStart(2, "0")}
                       </div>
-                      <div
-                        onFocus={() => setFocusedIdx(i)}
-                        onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocusedIdx(null); }}
-                      >
-                        {s.kind === "list" ? (
-                          <ListInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint}
-                            wrapperStyle={{ display: "flex", flexDirection: "column" }}
-                            rowStyle={{ display: "flex", alignItems: "center", gap: 14, padding: "7px 0", boxShadow: "inset 0 -1px 0 var(--line)" }}
-                            badgeStyle={{ width: 18, color: focused ? "var(--accent)" : "var(--ink-4)", fontFamily: "var(--font-mono)", fontSize: 11, flexShrink: 0, textAlign: "right", padStart: 2 }}
-                            inputExtraStyle={{ fontSize: 15, fontFamily: "var(--font-sans)", color: "var(--ink-0)" }}
-                            addStyle={{ padding: "8px 0", display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 12, fontFamily: "var(--font-mono)", textAlign: "left", width: "100%" }}
-                          />
-                        ) : s.kind === "block" ? (
-                          <BlockInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint} rows={s.rows}
-                            style={{ width: "100%", background: "transparent", boxShadow: underline, padding: "6px 0", fontSize: 15, color: "var(--ink-0)", fontFamily: "var(--font-sans)", lineHeight: 1.65, transition: "box-shadow 0.15s" }} />
-                        ) : (
-                          <LineInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint}
-                            style={{ height: 36, background: "transparent", boxShadow: underline, padding: "0", fontSize: 15, color: "var(--ink-0)", fontFamily: "var(--font-sans)", transition: "box-shadow 0.15s" }} />
-                        )}
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 8 }}>
+                          <label htmlFor={fid} style={{
+                            fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 500,
+                            color: focused ? "var(--ink-0)" : "var(--ink-1)", letterSpacing: -0.2,
+                            transition: "color 0.15s",
+                          }}>{s.title}</label>
+                          <span style={{ fontSize: 9, color: "var(--ink-4)", fontFamily: "var(--font-mono)", textTransform: "uppercase", letterSpacing: 1.2 }}>{s.kind}</span>
+                        </div>
+                        <div
+                          onFocus={() => setFocusedIdx(i)}
+                          onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setFocusedIdx(null); }}
+                        >
+                          {s.kind === "list" ? (
+                            <ListInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint}
+                              wrapperStyle={{ display: "flex", flexDirection: "column" }}
+                              rowStyle={{ display: "flex", alignItems: "center", gap: 14, padding: "7px 0", boxShadow: "inset 0 -1px 0 var(--line)" }}
+                              badgeStyle={{ width: 18, color: focused ? "var(--accent)" : "var(--ink-4)", fontFamily: "var(--font-mono)", fontSize: 11, flexShrink: 0, textAlign: "right" }}
+                              badgePadLength={2}
+                              inputExtraStyle={{ fontSize: 15, fontFamily: "var(--font-sans)", color: "var(--ink-0)" }}
+                              addStyle={{ padding: "8px 0", display: "flex", alignItems: "center", gap: 8, color: "var(--ink-3)", fontSize: 12, fontFamily: "var(--font-mono)", textAlign: "left", width: "100%" }}
+                            />
+                          ) : s.kind === "block" ? (
+                            <BlockInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint} rows={s.rows}
+                              style={{ width: "100%", background: "transparent", boxShadow: underline, padding: "6px 0", fontSize: 15, color: "var(--ink-0)", fontFamily: "var(--font-sans)", lineHeight: 1.65, transition: "box-shadow 0.15s" }} />
+                          ) : (
+                            <LineInput id={fid} value={v} onChange={(val) => onChange(s.id, val)} placeholder={s.hint}
+                              style={{ height: 36, background: "transparent", boxShadow: underline, padding: "0", fontSize: 15, color: "var(--ink-0)", fontFamily: "var(--font-sans)", transition: "box-shadow 0.15s" }} />
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Floating preview card */}
-          {previewOpen ? (
-            <div style={{
-              position: "sticky", top: 20, float: "right",
-              marginRight: 20, marginTop: -200,
-              width: 272,
-              background: "var(--bg-1)", border: "1px solid var(--line-2)",
-              borderRadius: "var(--r-lg)", overflow: "hidden",
-              boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
-            }}>
+          {/* Preview panel column — outside scroll flow, no float/sticky needed */}
+          <div style={{
+            flexShrink: 0,
+            width: previewOpen ? 312 : 48,
+            padding: "20px 20px 20px 0",
+            transition: "width 0.2s",
+          }}>
+            {previewOpen ? (
               <div style={{
-                height: 32, padding: "0 10px",
-                display: "flex", alignItems: "center", gap: 7,
-                borderBottom: "1px solid var(--line)",
-                fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-mono)",
-                flexShrink: 0,
+                width: 272,
+                background: "var(--bg-1)", border: "1px solid var(--line-2)",
+                borderRadius: "var(--r-lg)", overflow: "hidden",
+                boxShadow: "0 16px 40px rgba(0,0,0,0.25)",
               }}>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
-                    <div key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.7 }} />
-                  ))}
-                </div>
-                <span style={{ flex: 1, marginLeft: 4 }}>prompt.md</span>
-                <span style={{ color: "var(--good)", fontSize: 10 }}>live</span>
-                <button onClick={() => setPreviewOpen(false)} style={{ color: "var(--ink-4)", fontSize: 14, marginLeft: 4, lineHeight: 1 }}>×</button>
-              </div>
-              <div style={{
-                padding: 12, maxHeight: 200, overflow: "hidden",
-                fontFamily: "var(--font-mono)", fontSize: 10.5, lineHeight: 1.7,
-                position: "relative",
-              }}>
-                <PromptPreview doc={doc} vals={docValues} />
                 <div style={{
-                  position: "absolute", left: 0, right: 0, bottom: 0, height: 48,
-                  background: "linear-gradient(to bottom, transparent, var(--bg-1))",
-                  pointerEvents: "none",
-                }} />
-              </div>
-              <div style={{ display: "flex", gap: 6, padding: 8, borderTop: "1px solid var(--line)" }}>
-                <button onClick={onCopy} style={{
-                  flex: 1, height: 30,
-                  background: copyState === "err" ? "var(--danger)" : "var(--accent)",
-                  color: "var(--accent-ink)", borderRadius: "var(--r-sm)",
-                  fontSize: 11, fontWeight: 600,
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  height: 32, padding: "0 10px",
+                  display: "flex", alignItems: "center", gap: 7,
+                  borderBottom: "1px solid var(--line)",
+                  fontSize: 11, color: "var(--ink-3)", fontFamily: "var(--font-mono)",
+                  flexShrink: 0,
                 }}>
-                  {copyLabel}
-                  {!copyState && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, opacity: 0.65 }}>⌘↵</span>}
-                </button>
-                <button onClick={onExportAll} style={{
-                  width: 30, height: 30,
-                  border: "1px solid var(--line-2)", borderRadius: "var(--r-sm)",
-                  color: "var(--ink-2)", display: "grid", placeItems: "center", fontSize: 14,
-                }}>↗</button>
+                  <div style={{ display: "flex", gap: 4 }}>
+                    {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
+                      <div key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c, opacity: 0.7 }} />
+                    ))}
+                  </div>
+                  <span style={{ flex: 1, marginLeft: 4 }}>prompt.md</span>
+                  <span style={{ color: "var(--good)", fontSize: 10 }}>live</span>
+                  <button onClick={() => setPreviewOpen(false)} style={{ color: "var(--ink-4)", fontSize: 14, marginLeft: 4, lineHeight: 1 }}>×</button>
+                </div>
+                <div style={{
+                  padding: 12, maxHeight: 200, overflow: "hidden",
+                  fontFamily: "var(--font-mono)", fontSize: 10.5, lineHeight: 1.7,
+                  position: "relative",
+                }}>
+                  <PromptPreview doc={doc} vals={docValues} />
+                  <div style={{
+                    position: "absolute", left: 0, right: 0, bottom: 0, height: 48,
+                    background: "linear-gradient(to bottom, transparent, var(--bg-1))",
+                    pointerEvents: "none",
+                  }} />
+                </div>
+                <div style={{ display: "flex", gap: 6, padding: 8, borderTop: "1px solid var(--line)" }}>
+                  <button onClick={onCopy} style={{
+                    flex: 1, height: 30,
+                    background: copyState === "err" ? "var(--danger)" : "var(--accent)",
+                    color: "var(--accent-ink)", borderRadius: "var(--r-sm)",
+                    fontSize: 11, fontWeight: 600,
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  }}>
+                    {copyLabel}
+                    {!copyState && <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, opacity: 0.65 }}>⌘↵</span>}
+                  </button>
+                  <button onClick={onExportAll} style={{
+                    width: 30, height: 30,
+                    border: "1px solid var(--line-2)", borderRadius: "var(--r-sm)",
+                    color: "var(--ink-2)", display: "grid", placeItems: "center", fontSize: 14,
+                  }}>↗</button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div style={{ position: "sticky", top: 20, float: "right", marginRight: 20, marginTop: -40 }}>
+            ) : (
               <button onClick={() => setPreviewOpen(true)} style={{
                 height: 28, padding: "0 12px",
                 background: "var(--bg-1)", border: "1px solid var(--line-2)",
@@ -246,8 +252,8 @@ export function ManuscriptDirection({ docs, activeDoc, onSelectDoc, docValues, a
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 10 }}>prompt.md</span>
                 <span>↗</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

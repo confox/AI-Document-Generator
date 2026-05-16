@@ -4,6 +4,7 @@ import { PromptPreview } from "@/components/PromptPreview.jsx";
 import { LineInput } from "@/components/inputs/LineInput.jsx";
 import { BlockInput } from "@/components/inputs/BlockInput.jsx";
 import { ListInput } from "@/components/inputs/ListInput.jsx";
+import { getCopyLabel } from "@/utils/ui.js";
 
 export function TerminalDirection({ docs, activeDoc, onSelectDoc, docValues, allValues, onChange, onCopy, onExportAll, copyState, exportState, settings }) {
   const doc = docs[activeDoc];
@@ -12,8 +13,8 @@ export function TerminalDirection({ docs, activeDoc, onSelectDoc, docValues, all
 
   useEffect(() => { setFocusedIdx(null); }, [activeDoc]);
 
-  const copyLabel = copyState === "ok" ? "✓ copied!" : copyState === "err" ? "✗ failed" : "$ copy_as_prompt";
-  const exportLabel = exportState === "ok" ? "✓ exported!" : exportState === "err" ? "✗ failed" : "export";
+  const copyLabel = getCopyLabel(copyState, { idle: "$ copy_as_prompt", ok: "✓ copied!", err: "✗ failed" });
+  const exportLabel = getCopyLabel(exportState, { idle: "export", ok: "✓ exported!", err: "✗ failed" });
 
   return (
     <div style={{

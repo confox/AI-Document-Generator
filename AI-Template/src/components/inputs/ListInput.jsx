@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function ListInput({ id, value, onChange, placeholder, wrapperStyle, rowStyle, badgeStyle, inputExtraStyle, addStyle }) {
+export function ListInput({ id, value, onChange, placeholder, wrapperStyle, rowStyle, badgeStyle, badgePadLength = 1, inputExtraStyle, addStyle }) {
   const items = value ? value.split("\n") : [""];
   const displayItems = items.length ? items : [""];
   const [addHovered, setAddHovered] = useState(false);
@@ -18,7 +18,7 @@ export function ListInput({ id, value, onChange, placeholder, wrapperStyle, rowS
       {displayItems.map((item, i) => (
         <div key={i} style={rowStyle}>
           {badgeStyle && (
-            <span style={badgeStyle}>{String(i + 1).padStart(badgeStyle.padStart || 1, "0")}</span>
+            <span style={badgeStyle}>{String(i + 1).padStart(badgePadLength, "0")}</span>
           )}
           <input
             id={i === 0 ? id : undefined}
