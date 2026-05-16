@@ -6,7 +6,7 @@ A browser-based and installable desktop tool that helps you build the **10 essen
 
 ## Download
 
-Grab the latest installer for your platform from the [Releases](https://github.com/confox/AI-Docs-Generator/releases) page:
+Grab the latest installer for your platform from the [Releases](https://github.com/confox/AI-Document-Generator/releases) page:
 
 | Platform | File |
 | -------- | ---- |
@@ -15,7 +15,7 @@ Grab the latest installer for your platform from the [Releases](https://github.c
 | Linux | `.AppImage` or `.deb` |
 
 Or use it instantly in the browser — no install required:  
-**[Open in browser →](https://confox.github.io/AI-Docs-Generator)**
+**[Open in browser →](https://confox.github.io/AI-Document-Generator/)**
 
 ---
 
@@ -80,8 +80,8 @@ The `examples/` folder contains all 10 documents fully filled in for a fictional
 ### Run locally
 
 ```bash
-git clone https://github.com/confox/AI-Docs-Generator.git
-cd AI-Docs-Generator/AI-Template
+git clone https://github.com/confox/AI-Document-Generator.git
+cd AI-Document-Generator/AI-Template
 npm install
 npm run dev        # browser: http://localhost:5173
 npm run tauri dev  # desktop app
