@@ -87,11 +87,12 @@ export default function App() {
       <button
         onClick={() => {
           Sentry.logger.info("User triggered test error", { action: "test_error_button_click" });
-          Sentry.metrics.count("test_counter", 1);
-          throw new Error("This is your first error!");
+          const err = new Error("This is your first error!");
+          Sentry.captureException(err); // explicit capture — guaranteed delivery
+          throw err; // also throw so React error handlers fire
         }}
         style={{
-          position: "fixed", bottom: 18, right: 18, zIndex: 9999,
+          position: "fixed", bottom: 62, left: 18, zIndex: 9999,
           padding: "8px 14px", borderRadius: "var(--r-md)",
           background: "#e53e3e", color: "#fff", border: "none",
           fontFamily: "var(--font-mono)", fontSize: 12, cursor: "pointer",
