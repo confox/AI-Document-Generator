@@ -1,6 +1,6 @@
 {
   "productName": "AI Docs Generator",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "identifier": "uk.co.d4rkwolf.ai-docs-generator",
   "build": {
     "beforeDevCommand": "npm run dev",
