@@ -74,6 +74,6 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: AI Docs Generator ${{ github.ref_name }}
           releaseBody: Download the installer for your platform below.
-          releaseDraft: false
+          releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
